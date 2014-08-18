@@ -13,9 +13,11 @@ def make_headers(worksheet):
     cell_idx = 0
     while cell_idx < worksheet.ncols:
         cell_type = worksheet.cell_type(0, cell_idx)
+        cell_value = worksheet.cell_value(0, cell_idx)
         if cell_type == 1:
-            headers[cell_idx] = worksheet.cell_value(0, cell_idx)
+            headers[cell_idx] = cell_value
         cell_idx += 1
+
     return headers
 
 
@@ -36,6 +38,7 @@ def clean_dates(worksheet, writer, headers, datemode):
                 else:
                     parts = xlrd.xldate_as_tuple(cell_value, datemode)
                     cell_value = datetime(*parts)
+
             else:
                 try:
                     # Strings

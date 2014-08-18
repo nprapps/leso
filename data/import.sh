@@ -10,6 +10,22 @@
 echo "Run clean.py to generate leso.csv"
 ./clean.py
 
+# get the columns we want
+csvcut -c 1,2,4,5,7,8 leso.csv > leso-clean.csv
+
+# csvkit works a-ok for mraps
+echo "Generate mraps.csv"
+in2csv --sheet "cleaned data" --no-inference MRAPS\ by\ County\ as\ of\ 24\ July\ 2014.xlsx > mraps.csv
+
+# make the cost columns the same
+echo "clean cost columns"
+sed -i '' -e 's/Acquisition Cost/Cost/' leso-clean.csv
+sed -i '' -e 's/Unit Cost/Cost/' mraps.csv
+
+# echo "Run merge.py to merge mraps with leso"
+# ./merge.py
+
+
 # setup our database
 echo "Create database"
 dropdb --if-exists leso
@@ -19,9 +35,8 @@ psql leso -c "CREATE EXTENSION postgis_topology"
 psql leso -c "SELECT postgis_full_version()"
 
 # get leso csv in the db
-
-psql leso -c "CREATE TABLE data (STATE char(2), COUNTY varchar, ID varchar, NAME varchar, UNIT varchar, UI varchar, COST varchar, DATE varchar);"
-psql leso -c "COPY data FROM '/Users/tylerfisher/src/leso/data/leso.csv' DELIMITER ',' CSV;"
+psql leso -c "CREATE TABLE data (STATE char(2), COUNTY varchar, NAME varchar, UNIT varchar, COST varchar, DATE varchar);"
+psql leso -c "COPY data FROM '/Users/tylerfisher/src/leso/data/stacked.csv' DELIMITER ',' CSV;"
 
 if [ ! -f "./tl_2013_us_county.zip" ]
 then
