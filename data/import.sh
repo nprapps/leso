@@ -17,9 +17,12 @@ createdb leso
 psql leso -c "CREATE EXTENSION postgis;"
 psql leso -c "SELECT postgis_full_version()"
 
-echo "Get county TIGER data"
-curl -O http://www2.census.gov/geo/tiger/TIGER2013/COUNTY/tl_2013_us_county.zip
-unzip tl_2013_us_county -d tl_2013_us_county
+if [ ! -f "./tl_2013_us_county.zip" ]
+then
+  echo "Get county TIGER data"
+  curl -O http://www2.census.gov/geo/tiger/TIGER2013/COUNTY/tl_2013_us_county.zip
+  unzip tl_2013_us_county.zip -d tl_2013_us_county
+fi
 
 # import the geo data
 # gotta set the client encoding -- the import fails otherwise
