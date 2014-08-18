@@ -7,11 +7,8 @@
 #in2csv --sheet "STATES T-W" --no-inference LESO\ Jan\ 2006\ to\ April\ 2014.xlsx > t-w.csv
 
 # stack 'em up!
-echo "Stack alphabetical files to create leso.csv"
-csvstack a-f.csv g-m.csv n-s.csv t-w.csv > leso.csv
-
-# clean up ship date column
-#TODO
+echo "Run clean.py to generate leso.csv"
+./clean.py
 
 # csvkit works a-ok for mraps
 echo "Generate mraps.csv"
