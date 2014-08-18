@@ -10,18 +10,6 @@
 echo "Run clean.py to generate leso.csv"
 ./clean.py
 
-# csvkit works a-ok for mraps
-echo "Generate mraps.csv"
-in2csv --sheet "cleaned data" --no-inference MRAPS\ by\ County\ as\ of\ 24\ July\ 2014.xlsx > mraps.csv
-
-# merge the files
-# make the cost columns the same
-echo "Merge and clean to create stacked.csv"
-sed -i '' -e 's/Acquisition Cost/Cost/' leso.csv
-sed -i '' -e 's/Unit Cost/Cost/' mraps.csv
-# and stack them
-csvstack leso.csv mraps.csv > stacked.csv
-
 # setup our database
 echo "Create database"
 dropdb --if-exists leso
