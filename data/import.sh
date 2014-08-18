@@ -6,7 +6,7 @@
 #in2csv --sheet "STATES N-S" --no-inference LESO\ Jan\ 2006\ to\ April\ 2014.xlsx > n-s.csv
 #in2csv --sheet "STATES T-W" --no-inference LESO\ Jan\ 2006\ to\ April\ 2014.xlsx > t-w.csv
 
-# stack 'em up!
+# clean up dates and strings!
 echo "Run clean.py to generate leso.csv"
 ./clean.py
 
@@ -15,7 +15,13 @@ echo "Create database"
 dropdb --if-exists leso
 createdb leso
 psql leso -c "CREATE EXTENSION postgis;"
+psql leso -c "CREATE EXTENSION postgis_topology"
 psql leso -c "SELECT postgis_full_version()"
+
+# get leso csv in the db
+
+psql leso -c "CREATE TABLE data (STATE char(2), COUNTY varchar, ID varchar, NAME varchar, UNIT varchar, UI varchar, COST varchar, DATE varchar);"
+psql leso -c "COPY data FROM '/Users/tylerfisher/src/leso/data/leso.csv' DELIMITER ',' CSV;"
 
 if [ ! -f "./tl_2013_us_county.zip" ]
 then
