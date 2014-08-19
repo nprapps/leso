@@ -4,6 +4,8 @@ import csv
 import xlrd
 from datetime import datetime
 
+from slugify import slugify
+
 IMPORT_FILE = "LESO Jan 2006 to April 2014.xlsx"
 
 
@@ -14,6 +16,7 @@ def make_headers(worksheet):
     while cell_idx < worksheet.ncols:
         cell_type = worksheet.cell_type(0, cell_idx)
         cell_value = worksheet.cell_value(0, cell_idx)
+        cell_value = slugify(cell_value).replace('-', '_')
         if cell_type == 1:
             headers[cell_idx] = cell_value
         cell_idx += 1
@@ -28,7 +31,7 @@ def clean_dates(worksheet, writer, headers, datemode):
         row_dict = {}
         while cell_idx < worksheet.ncols:
             header = headers[cell_idx]
-            if header == "Ship Date":
+            if header == "ship_date":
                 # clean date
                 cell_value = worksheet.cell_value(row_idx, cell_idx)
                 if cell_value > 20000000:
@@ -38,6 +41,14 @@ def clean_dates(worksheet, writer, headers, datemode):
                 else:
                     parts = xlrd.xldate_as_tuple(cell_value, datemode)
                     cell_value = datetime(*parts)
+
+            elif header == 'nsn':
+                cell_value = str(worksheet.cell_value(row_idx, cell_idx))
+                id_prefix = cell_value.split('-')[0]
+                row_dict['id_category'] = id_prefix
+
+                supercategory = id_prefix[:2]
+                row_dict['supercategory'] = supercategory
 
             else:
                 try:
@@ -57,8 +68,11 @@ if __name__ == "__main__":
     datemode = workbook.datemode
     worksheets = workbook.sheet_names()
     headers = make_headers(workbook.sheet_by_name(worksheets[0]))
+    headers['id_category'] = 'id_category'
+    headers['supercategory'] = 'supercategory'
     f = open("leso.csv", "w")
     writer = csv.DictWriter(f, fieldnames=headers.values())
+    writer.writeheader()
     for worksheet in worksheets:
         sheet = workbook.sheet_by_name(worksheet)
         clean_dates(sheet, writer, headers, datemode)
