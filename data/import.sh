@@ -45,7 +45,7 @@ psql leso -c "COPY codes FROM '`pwd`/codes.csv' DELIMITER ',' CSV HEADER;"
 psql leso -c "DELETE FROM codes USING codes codes2 WHERE codes.code=codes2.code AND codes.START_DATE > codes2.START_DATE;"
 
 echo "Generate distributions"
-psql leso -c "COPY (select c.full_name, count(d.id_category), sum(d.acquisition_cost) from data as d join codes as c on d.id_category = c.code group by c.full_name order by c.full_name) to '`pwd`/category_distribution.csv' WITH CSV HEADER;"
+psql leso -c "COPY (select c.full_name, sum(quantity) as total_quantity, sum(d.acquisition_cost) as total_cost from data as d join codes as c on d.id_category = c.code group by c.full_name order by c.full_name) to '`pwd`/category_distribution.csv' WITH CSV HEADER;"
 
 #psql leso-c "COPY (select c.name, count(d.supercategory), sum(d.acquisition_cost) from data as d join codes as c on d.supercategory = c.code group by d.supercategory, c.name order by d.supercategory) to '`pwd`/supercategory_distribution.csv' WITH CSV HEADER;"
 
