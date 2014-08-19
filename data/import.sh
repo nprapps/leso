@@ -13,14 +13,41 @@ psql leso -c "CREATE EXTENSION postgis_topology"
 psql leso -c "SELECT postgis_full_version()"
 
 # get leso csv in the db
-psql leso -c "CREATE TABLE data (state char(2), county varchar, nsn varchar, item_name varchar, quantity decimal, ui varchar, acquisition_cost decimal, ship_date timestamp, supercategory varchar, id_category varchar);"
+echo "Import leso.csv to database"
+psql leso -c "CREATE TABLE data (
+  state char(2),
+  county varchar,
+  nsn varchar,
+  item_name varchar,
+  quantity decimal,
+  ui varchar,
+  acquisition_cost decimal,
+  ship_date timestamp,
+  supercategory varchar,
+  id_category varchar
+);"
 psql leso -c "COPY data FROM '`pwd`/leso.csv' DELIMITER ',' CSV HEADER;"
 
-psql leso -c "CREATE TABLE codes (CODE varchar(16), NAME text, START_DATE varchar, END_DATE varchar, FULL_NAME text, EXCLUDES text, NOTES text, INCLUDES text)"
+echo "Import federal supply codes to database"
+psql leso -c "CREATE TABLE codes (
+  CODE varchar(16),
+  NAME text,
+  START_DATE varchar,
+  END_DATE varchar,
+  FULL_NAME text,
+  EXCLUDES text,
+  NOTES text,
+  INCLUDES text
+);"
 psql leso -c "COPY codes FROM '`pwd`/codes.csv' DELIMITER ',' CSV HEADER;"
 
+# De-dupe the supply codes
+psql leso -c "DELETE FROM codes USING codes codes2 WHERE codes.code=codes2.code AND codes.START_DATE > codes2.START_DATE;"
+
+echo "Generate distributions"
 psql leso -c "COPY (select c.full_name, count(d.id_category), sum(d.acquisition_cost) from data as d join codes as c on d.id_category = c.code group by c.full_name order by c.full_name) to '`pwd`/category_distribution.csv' WITH CSV HEADER;"
-psql leso-c "COPY (select c.name, count(d.supercategory), sum(d.acquisition_cost) from data as d join codes as c on d.supercategory = c.code group by d.supercategory, c.name order by d.supercategory) to '`pwd`/supercategory_distribution.csv' WITH CSV HEADER;"
+
+#psql leso-c "COPY (select c.name, count(d.supercategory), sum(d.acquisition_cost) from data as d join codes as c on d.supercategory = c.code group by d.supercategory, c.name order by d.supercategory) to '`pwd`/supercategory_distribution.csv' WITH CSV HEADER;"
 
 if [ ! -f "./tl_2013_us_county.zip" ]
 then
