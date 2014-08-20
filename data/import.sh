@@ -50,25 +50,28 @@ psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((q
 
 psql leso -c "COPY (
 select c.full_name, c.code as federal_supply_code,
-  sum(quantity) as total_quantity, sum((d.quantity * d.acquisition_cost)) as total_cost, 
-  avg(d.acquisition_cost) as avg_acquisition_cost, min(d.acquisition_cost) as min_acquisition_cost, max(d.acquisition_cost) as max_acquisition_cost, 
-  avg(d.quantity) as avg_quantity, min(d.quantity) as min_quantity, max(d.quantity) as max_quantity
+  sum((d.quantity * d.acquisition_cost)) as total_cost,
   from data as d
   join codes as c on d.id_category = c.code
-  where d.ui = 'Each' or d.ui = 'EA' or d.ui = 'EACH'
   group by c.full_name, c.code
   order by c.full_name
 ) to '`pwd`/category_distribution.csv' WITH CSV HEADER;"
 
 psql leso -c "COPY (
-select d.item_name, c.full_name, c.code as federal_supply_code,
+select c.full_name, c.code as supercategory_code,
+  sum((d.quantity * d.acquisition_cost)) as total_cost,
+  from data as d
+  join codes as c on d.supercategory = c.code
+  group by c.full_name, c.code
+  order by c.full_name
+) to '`pwd`/supercategory_distribution.csv' WITH CSV HEADER;"
+
+psql leso -c "COPY (
+select d.item_name, c.full_name, c.code as federal_supply_code, d.ui,
   sum(quantity) as total_quantity, sum((d.quantity * d.acquisition_cost)) as total_cost, 
-  avg(d.acquisition_cost) as avg_acquisition_cost, min(d.acquisition_cost) as min_acquisition_cost, max(d.acquisition_cost) as max_acquisition_cost, 
-  avg(d.quantity) as avg_quantity, min(d.quantity) as min_quantity, max(d.quantity) as max_quantity
   from data as d
   join codes as c on d.id_category = c.code
-  where d.ui = 'Each' or d.ui = 'EA' or d.ui = 'EACH'
-  group by c.full_name, c.code, d.item_name
+  group by c.full_name, c.code, d.item_name, d.ui
   order by d.item_name
 ) to '`pwd`/item_name_distribution.csv' WITH CSV HEADER;"
 
