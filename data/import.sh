@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # clean up dates and strings!
-echo "Run clean.py to generate leso.csv"
-./clean.py
+#echo "Run clean.py to generate leso.csv"
+#./clean.py
 
 # setup our database
 echo "Create database"
@@ -28,6 +28,15 @@ psql leso -c "CREATE TABLE data (
 );"
 psql leso -c "COPY data FROM '`pwd`/leso.csv' DELIMITER ',' CSV HEADER;"
 
+echo "Import FIPS crosswalk"
+psql leso -c "CREATE TABLE fips (
+  county varchar,
+  state varchar,
+  fips integer
+);"
+psql leso -c "COPY fips FROM '`pwd`/fips_crosswalk.csv' DELIMITER ',' CSV HEADER;"
+
+
 echo "Import federal supply codes to database"
 psql leso -c "CREATE TABLE codes (
   CODE varchar(16),
@@ -44,34 +53,46 @@ psql leso -c "COPY codes FROM '`pwd`/codes.csv' DELIMITER ',' CSV HEADER;"
 # De-dupe the supply codes
 psql leso -c "DELETE FROM codes USING codes codes2 WHERE codes.code=codes2.code AND codes.START_DATE > codes2.START_DATE;"
 
-echo "Generate distributions"
-psql leso -c "COPY (select full_name, id_category, ui, sum(quantity) as total_quantity, sum((acquisition_cost * quantity)) as total_cost from data join codes on data.id_category = codes.code group by id_category, full_name, ui) to '`pwd`/item_distribution_with_units.csv' WITH CSV HEADER;"
+echo "Generate unit distribution"
 psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((quantity*acquisition_cost)) as total_cost from data group by ui order by count desc) to '`pwd`/unit_distribution.csv' WITH CSV HEADER;"
 
+echo "Generate category distribution"
 psql leso -c "COPY (
 select c.full_name, c.code as federal_supply_code,
-  sum((d.quantity * d.acquisition_cost)) as total_cost,
+  sum((d.quantity * d.acquisition_cost)) as total_cost
   from data as d
   join codes as c on d.id_category = c.code
   group by c.full_name, c.code
   order by c.full_name
 ) to '`pwd`/category_distribution.csv' WITH CSV HEADER;"
 
+echo "Generate supercategory distirbution"
 psql leso -c "COPY (
-select c.full_name, c.code as supercategory_code,
-  sum((d.quantity * d.acquisition_cost)) as total_cost,
+select c.name, c.code as supercategory_code,
+  sum((d.quantity * d.acquisition_cost)) as total_cost
   from data as d
   join codes as c on d.supercategory = c.code
-  group by c.full_name, c.code
-  order by c.full_name
+  group by c.name, c.code
+  order by c.name
 ) to '`pwd`/supercategory_distribution.csv' WITH CSV HEADER;"
 
+echo "Generate item name distribution with units"
 psql leso -c "COPY (
 select d.item_name, c.full_name, c.code as federal_supply_code, d.ui,
-  sum(quantity) as total_quantity, sum((d.quantity * d.acquisition_cost)) as total_cost, 
+  sum(quantity) as total_quantity, sum((d.quantity * d.acquisition_cost)) as total_cost
   from data as d
   join codes as c on d.id_category = c.code
   group by c.full_name, c.code, d.item_name, d.ui
+  order by d.item_name
+) to '`pwd`/item_name_distribution_with_units.csv' WITH CSV HEADER;"
+
+echo "Generate item name distribution without units"
+psql leso -c "COPY (
+select d.item_name, c.full_name, c.code as federal_supply_code,
+  sum((d.quantity * d.acquisition_cost)) as total_cost
+  from data as d
+  join codes as c on d.id_category = c.code
+  group by c.full_name, c.code, d.item_name
   order by d.item_name
 ) to '`pwd`/item_name_distribution.csv' WITH CSV HEADER;"
 
