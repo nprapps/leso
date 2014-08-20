@@ -3,3 +3,4 @@ data/tl_2013_us_county.zip
 data/*.csv
 !data/codes.csv
 !data/fips_crosswalk.csv
+.DS_Store
