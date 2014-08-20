@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # clean up dates and strings!
-#echo "Run clean.py to generate leso.csv"
-#./clean.py
+echo "Run clean.py to generate leso.csv"
+./clean.py
 
 # setup our database
 echo "Create database"
