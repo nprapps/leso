@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # clean up dates and strings!
-echo "Run clean.py to generate leso.csv"
-./clean.py
+#echo "Run clean.py to generate leso.csv"
+#./clean.py
 
 # setup our database
 echo "Create database"
@@ -45,10 +45,32 @@ psql leso -c "COPY codes FROM '`pwd`/codes.csv' DELIMITER ',' CSV HEADER;"
 psql leso -c "DELETE FROM codes USING codes codes2 WHERE codes.code=codes2.code AND codes.START_DATE > codes2.START_DATE;"
 
 echo "Generate distributions"
-psql leso -c "COPY (select c.full_name, c.code as federal_supply_code, sum(quantity) as total_quantity, sum(d.acquisition_cost) as total_cost from data as d join codes as c on d.id_category = c.code group by c.full_name, c.code order by c.full_name) to '`pwd`/category_distribution.csv' WITH CSV HEADER;"
-psql leso -c "COPY (select d.item_name, c.full_name, c.code as federal_supply_code, sum(quantity) as total_quantity, sum(d.acquisition_cost) as total_cost from data as d join codes as c on d.id_category = c.code group by d.item_name, c.full_name, c.code order by federal_supply_code) to '`pwd`/item_name_distribution.csv' WITH CSV HEADER;"
+psql leso -c "COPY (select full_name, id_category, ui, sum(quantity) as total_quantity, sum((acquisition_cost * quantity)) as total_cost from data join codes on data.id_category = codes.code group by id_category, full_name, ui) to '`pwd`/item_distribution_with_units.csv' WITH CSV HEADER;"
+psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((quantity*acquisition_cost)) as total_cost from data group by ui order by count desc) to '`pwd`/unit_distribution.csv' WITH CSV HEADER;"
 
-#psql leso-c "COPY (select c.name, count(d.supercategory), sum(d.acquisition_cost) from data as d join codes as c on d.supercategory = c.code group by d.supercategory, c.name order by d.supercategory) to '`pwd`/supercategory_distribution.csv' WITH CSV HEADER;"
+psql leso -c "COPY (
+select c.full_name, c.code as federal_supply_code,
+  sum(quantity) as total_quantity, sum((d.quantity * d.acquisition_cost)) as total_cost, 
+  avg(d.acquisition_cost) as avg_acquisition_cost, min(d.acquisition_cost) as min_acquisition_cost, max(d.acquisition_cost) as max_acquisition_cost, 
+  avg(d.quantity) as avg_quantity, min(d.quantity) as min_quantity, max(d.quantity) as max_quantity
+  from data as d
+  join codes as c on d.id_category = c.code
+  where d.ui = 'Each' or d.ui = 'EA' or d.ui = 'EACH'
+  group by c.full_name, c.code
+  order by c.full_name
+) to '`pwd`/category_distribution.csv' WITH CSV HEADER;"
+
+psql leso -c "COPY (
+select d.item_name, c.full_name, c.code as federal_supply_code,
+  sum(quantity) as total_quantity, sum((d.quantity * d.acquisition_cost)) as total_cost, 
+  avg(d.acquisition_cost) as avg_acquisition_cost, min(d.acquisition_cost) as min_acquisition_cost, max(d.acquisition_cost) as max_acquisition_cost, 
+  avg(d.quantity) as avg_quantity, min(d.quantity) as min_quantity, max(d.quantity) as max_quantity
+  from data as d
+  join codes as c on d.id_category = c.code
+  where d.ui = 'Each' or d.ui = 'EA' or d.ui = 'EACH'
+  group by c.full_name, c.code, d.item_name
+  order by d.item_name
+) to '`pwd`/item_name_distribution.csv' WITH CSV HEADER;"
 
 if [ ! -f "./tl_2013_us_county.zip" ]
 then
@@ -56,6 +78,7 @@ then
   curl -O http://www2.census.gov/geo/tiger/TIGER2013/COUNTY/tl_2013_us_county.zip
   unzip tl_2013_us_county.zip -d tl_2013_us_county
 fi
+
 
 # import the geo data
 # gotta set the client encoding -- the import fails otherwise
