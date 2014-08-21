@@ -18,6 +18,7 @@ pyparsing==2.0.2
 pyspatialite==3.0.1
 python-dateutil==2.2
 six==1.7.3
+slugify==0.0.1
 tornado==4.0.1
 wsgiref==0.1.2
 wxPython==3.0.0.0
