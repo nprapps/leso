@@ -1,5 +1,6 @@
 tl_2013_us_county.zip
 src/tl_2013_us_county
 build
+state_data
 src/leso.csv
 .DS_Store
