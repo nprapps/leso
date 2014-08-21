@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mkdir -p state_data
+
 psql leso -t -A -c "select distinct(state) from data" | while read STATE; do
   echo "$STATE.csv"
   psql leso -c "COPY (
