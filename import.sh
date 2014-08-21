@@ -1,12 +1,8 @@
 #!/bin/bash
 
 # clean up dates and strings!
-
-if [ $1 != "skip-clean" ]
-then
-  echo "Run clean.py to generate leso.csv"
-  ./clean.py
-fi
+echo "Run clean.py to generate leso.csv"
+./clean.py
 
 # setup our database
 echo "Create database"
@@ -105,5 +101,5 @@ fi
 # import the geo data
 # gotta set the client encoding -- the import fails otherwise
 echo "Import geo data"
-PGCLIENTENCODING=LATIN1 ogr2ogr -f PostgreSQL PG:dbname=leso tl_2013_us_county/tl_2013_us_county.shp -t_srs EPSG:900913 -nlt multipolygon -nln tl_2013_us_county
+PGCLIENTENCODING=LATIN1 ogr2ogr -f PostgreSQL PG:dbname=leso src/tl_2013_us_county/tl_2013_us_county.shp -t_srs EPSG:900913 -nlt multipolygon -nln tl_2013_us_county
 

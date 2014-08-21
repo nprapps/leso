@@ -1,5 +1,5 @@
 tl_2013_us_county.zip
-tl_2013_us_county
+src/tl_2013_us_county
 build
 src/leso.csv
 .DS_Store
