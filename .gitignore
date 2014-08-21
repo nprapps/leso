@@ -1,6 +1,4 @@
-data/tl_2013_us_county/*
-data/tl_2013_us_county.zip
-data/*.csv
-!data/codes.csv
-!data/fips_crosswalk.csv
+tl_2013_us_county
+build
+src/leso.csv
 .DS_Store

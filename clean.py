@@ -6,7 +6,7 @@ from datetime import datetime
 
 from slugify import slugify
 
-IMPORT_FILE = "LESO Jan 2006 to April 2014.xlsx"
+IMPORT_FILE = "src/LESO Jan 2006 to April 2014.xlsx"
 
 
 def make_headers(worksheet):
@@ -70,7 +70,7 @@ if __name__ == "__main__":
     headers = make_headers(workbook.sheet_by_name(worksheets[0]))
     headers['id_category'] = 'id_category'
     headers['supercategory'] = 'supercategory'
-    f = open("leso.csv", "w")
+    f = open("src/leso.csv", "w")
     writer = csv.DictWriter(f, fieldnames=headers.values())
     writer.writeheader()
     for worksheet in worksheets:

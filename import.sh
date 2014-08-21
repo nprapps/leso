@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # clean up dates and strings!
-#echo "Run clean.py to generate leso.csv"
-#./clean.py
+
+if [ $1 != "skip-clean" ]
+then
+  echo "Run clean.py to generate leso.csv"
+  ./clean.py
+fi
 
 # setup our database
 echo "Create database"
@@ -26,7 +30,7 @@ psql leso -c "CREATE TABLE data (
   supercategory varchar,
   id_category varchar
 );"
-psql leso -c "COPY data FROM '`pwd`/leso.csv' DELIMITER ',' CSV HEADER;"
+psql leso -c "COPY data FROM '`pwd`/src/leso.csv' DELIMITER ',' CSV HEADER;"
 
 echo "Import FIPS crosswalk"
 psql leso -c "CREATE TABLE fips (
@@ -34,7 +38,7 @@ psql leso -c "CREATE TABLE fips (
   state varchar,
   fips varchar
 );"
-psql leso -c "COPY fips FROM '`pwd`/fips_crosswalk.csv' DELIMITER ',' CSV HEADER;"
+psql leso -c "COPY fips FROM '`pwd`/src/fips_crosswalk.csv' DELIMITER ',' CSV HEADER;"
 
 
 echo "Import federal supply codes to database"
@@ -48,7 +52,7 @@ psql leso -c "CREATE TABLE codes (
   NOTES text,
   INCLUDES text
 );"
-psql leso -c "COPY codes FROM '`pwd`/codes.csv' DELIMITER ',' CSV HEADER;"
+psql leso -c "COPY codes FROM '`pwd`/src/codes.csv' DELIMITER ',' CSV HEADER;"
 
 # De-dupe the supply codes
 psql leso -c "DELETE FROM codes USING codes codes2 WHERE codes.code=codes2.code AND codes.START_DATE > codes2.START_DATE;"
@@ -79,7 +83,17 @@ psql leso -c "CREATE TABLE acs(
   two_or_more_races_excluding INTEGER,
   two_or_more_races_excluding_error NUMERIC
 );"
-PGCLIENTENCODING=LATIN1 psql leso -c "COPY acs FROM '`pwd`/census/acs_12_5yr_b02001.csv' DELIMITER ',' CSV"
+PGCLIENTENCODING=LATIN1 psql leso -c "COPY acs FROM '`pwd`/src/census/acs_12_5yr_b02001.csv' DELIMITER ',' CSV"
+
+echo "Generate population view"
+psql leso -c "CREATE OR REPLACE VIEW population as select d.state, d.county,
+    a.total, a.white_alone, a.black_alone, a.indian_alone, a.asian_alone, a.hawaiian_alone, a.other_race_alone, a.two_or_more_races, a.two_or_more_races_including, a.two_or_more_races_excluding,
+    (a.white_alone::numeric/a.total::numeric * 100) as white_percentage, (a.black_alone::numeric/a.total::numeric * 100) as black_percentage, (a.indian_alone::numeric/a.total::numeric * 100) as indian_percentage, (a.asian_alone::numeric/a.total::numeric * 100) as asian_percentage, (a.other_race_alone::numeric/a.total::numeric * 100) as other_race_percentage,
+    sum((d.quantity * d.acquisition_cost)) as total_cost, (sum((d.quantity * d.acquisition_cost))/a.total) as cost_per_capita
+  from data as d
+  join fips as f on d.state = f.state and d.county = f.county
+  join acs as a on f.fips = a.fips
+  group by d.state, d.county, a.total, a.white_alone, a.black_alone, a.indian_alone, a.asian_alone, a.hawaiian_alone, a.other_race_alone, a.two_or_more_races, a.two_or_more_races_including, a.two_or_more_races_excluding;"
 
 if [ ! -f "./tl_2013_us_county.zip" ]
 then
@@ -92,7 +106,4 @@ fi
 # gotta set the client encoding -- the import fails otherwise
 echo "Import geo data"
 PGCLIENTENCODING=LATIN1 ogr2ogr -f PostgreSQL PG:dbname=leso tl_2013_us_county/tl_2013_us_county.shp -t_srs EPSG:900913 -nlt multipolygon -nln tl_2013_us_county
-
-# merge with geo data
-
 
