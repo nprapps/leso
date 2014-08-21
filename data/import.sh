@@ -135,13 +135,32 @@ psql leso -c "COPY (
   group by d.state, d.county, a.total, a.white_alone, a.black_alone, a.indian_alone, a.asian_alone, a.hawaiian_alone, a.other_race_alone, a.two_or_more_races, a.two_or_more_races_including, a.two_or_more_races_excluding
 ) to '`pwd`/cost_by_population.csv' WITH CSV HEADER;"
 
+echo "Generate gun table"
+psql leso -c "COPY (
+select d.state, d.county, a.total, count(d.item_name), count(d.item_name)/a.total::numeric as per_capita from data as d 
+    join fips as f on d.state = f.state and d.county = f.county
+    join acs as a on f.fips = a.fips
+  where
+    item_name='GUNS, THROUGH 30MM' or
+    item_name='PISTOL, 40CAL, GLOCK GEN 3' or
+    item_name='PISTOL,CALIBER .45,AUTOMATIC' or
+    item_name='PISTON,GUN GAS CYLI' or
+    item_name='RIFLE,4.5 MILLIMETE' or
+    item_name='RIFLE,4.5 MILLIMETERS' or
+    item_name='RIFLE,5.56 MILLIMETER' or
+    item_name='RIFLE,7.62 MILLIMETER' or
+    item_name='SHOTGUN,12 GAGE' or
+    item_name='SHOTGUN,12 GAGE RIOT TYPE'
+  group by d.state, d.county, a.total
+  order by per_capita desc
+) to '`pwd`/guns_by_county.csv' WITH CSV HEADER;"
+
 if [ ! -f "./tl_2013_us_county.zip" ]
 then
   echo "Get county TIGER data"
   curl -O http://www2.census.gov/geo/tiger/TIGER2013/COUNTY/tl_2013_us_county.zip
   unzip tl_2013_us_county.zip -d tl_2013_us_county
 fi
-
 
 # import the geo data
 # gotta set the client encoding -- the import fails otherwise
