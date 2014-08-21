@@ -1,3 +1,5 @@
+mkdir -p build
+
 echo "Generate unit distribution"
 psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((quantity*acquisition_cost)) as total_cost from data group by ui order by count desc) to '`pwd`/build/unit_distribution.csv' WITH CSV HEADER;"
 

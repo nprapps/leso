@@ -99,7 +99,7 @@ if [ ! -f "./tl_2013_us_county.zip" ]
 then
   echo "Get county TIGER data"
   curl -O http://www2.census.gov/geo/tiger/TIGER2013/COUNTY/tl_2013_us_county.zip
-  unzip tl_2013_us_county.zip -d tl_2013_us_county
+  unzip tl_2013_us_county.zip -d src/tl_2013_us_county
 fi
 
 # import the geo data

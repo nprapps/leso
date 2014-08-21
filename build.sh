@@ -5,3 +5,6 @@ echo 'IMPORT THE DATA'
 
 echo 'CREATE THE OUTPUT FILES'
 ./output.sh
+
+echo 'GENERATE STATE FILES'
+./generate_states.sh
