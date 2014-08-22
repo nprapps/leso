@@ -30,17 +30,25 @@ def clean_dates(worksheet, writer, headers, datemode):
         cell_idx = 0
         row_dict = {}
         while cell_idx < worksheet.ncols:
-            header = headers[cell_idx]
+            try:
+                header = headers[cell_idx]
+            except KeyError:
+                cell_idx += 1
+                continue
+
             if header == "ship_date":
                 # clean date
-                cell_value = worksheet.cell_value(row_idx, cell_idx)
-                if cell_value > 20000000:
-                    # turn into string and parse as YYYYMMDD
-                    cell_value = str(int(cell_value))
-                    cell_value = datetime.strptime(cell_value, "%Y%m%d")
-                else:
-                    parts = xlrd.xldate_as_tuple(cell_value, datemode)
-                    cell_value = datetime(*parts)
+                try:
+                    cell_value = int(worksheet.cell_value(row_idx, cell_idx))
+                    if cell_value > 20000000:
+                        # turn into string and parse as YYYYMMDD
+                        cell_value = str(cell_value)
+                        cell_value = datetime.strptime(cell_value, "%Y%m%d")
+                    else:
+                        parts = xlrd.xldate_as_tuple(cell_value, datemode)
+                        cell_value = datetime(*parts)
+                except ValueError:
+                    cell_value = None
 
             elif header == 'nsn':
                 cell_value = str(worksheet.cell_value(row_idx, cell_idx))
@@ -49,6 +57,12 @@ def clean_dates(worksheet, writer, headers, datemode):
 
                 supercategory = id_prefix[:2]
                 row_dict['supercategory'] = supercategory
+
+            elif header == "quantity":
+                try:
+                    cell_value = int(worksheet.cell_value(row_idx, cell_idx))
+                except ValueError:
+                    cell_value = None
 
             else:
                 try:
@@ -59,6 +73,7 @@ def clean_dates(worksheet, writer, headers, datemode):
                     cell_value = worksheet.cell_value(row_idx, cell_idx)
             row_dict[header] = cell_value
             cell_idx += 1
+
         writer.writerow(row_dict)
         row_idx += 1
 

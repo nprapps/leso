@@ -4,6 +4,9 @@
 echo "Run clean.py to generate leso.csv"
 ./clean.py
 
+echo "Run clean_new_data.py to generate leso.csv"
+./clean_new_data.py
+
 # setup our database
 echo "Create database"
 dropdb --if-exists leso
@@ -27,6 +30,36 @@ psql leso -c "CREATE TABLE data (
   id_category varchar
 );"
 psql leso -c "COPY data FROM '`pwd`/src/leso.csv' DELIMITER ',' CSV HEADER;"
+
+# get updated general csv in the db
+echo "Import updated_general.csv to database"
+psql leso -c "CREATE TABLE general (
+  state char(2),
+  agency_name varchar,
+  nsn varchar,
+  item_name varchar,
+  quantity decimal,
+  ui varchar,
+  ship_date timestamp,
+  supercategory varchar,
+  id_category varchar
+);"
+psql leso -c "COPY general FROM '`pwd`/src/updated_general.csv' DELIMITER ',' CSV HEADER;"
+
+# get updated general csv in the db
+echo "Import updated_tactical.csv to database"
+psql leso -c "CREATE TABLE tactical (
+  state char(2),
+  county varchar,
+  nsn varchar,
+  item_name varchar,
+  quantity decimal,
+  ui varchar,
+  ship_date timestamp,
+  supercategory varchar,
+  id_category varchar
+);"
+psql leso -c "COPY tactical FROM '`pwd`/src/updated_tactical.csv' DELIMITER ',' CSV HEADER;"
 
 echo "Import FIPS crosswalk"
 psql leso -c "CREATE TABLE fips (
