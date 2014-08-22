@@ -8,3 +8,6 @@ echo 'CREATE THE OUTPUT FILES'
 
 echo 'GENERATE STATE FILES'
 ./generate_states.sh
+
+echo 'GENERATE RAW CSVs FOR OTHER DBs'
+./output_raw.sh
