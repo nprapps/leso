@@ -120,3 +120,28 @@ psql leso -c "COPY (
   from data where id_category = '5855'
   group by item_name order by total_cost desc
 ) to '`pwd`/build/night_vision_by_item.csv' WITH CSV HEADER;"
+
+# Handy queries used to double check #s in reporting
+
+# Bayonets
+# select sum(quantity), sum(acquisition_cost * quantity) from data where item_name='BAYONET' or item_name='BAYONET-KNIFE' or item_name='BAYONET AND SCABBARD' or item_name='BAYONET,SEALAND' or item_name='BAYONET AND SCABBAR';
+
+# Grenade launchers
+# select sum(quantity), sum(acquisition_cost * quantity) from data where item_name='LAUNCHER,GRENADE';
+
+# Combat knives
+# select sum(quantity), sum(acquisition_cost * quantity) from data where item_name='KNIFE,COMBAT' or item_name='KNIFE,COMBAT,WITH S' or item_name='KNIFE,COMBAT,WITH SHEATH';
+
+# Cargo planes
+# select sum(quantity), sum(acquisition_cost * quantity) from data where item_name='AIRPLANE,CARGO-TRANSPORT';
+
+# Ordinance robots
+# select sum(quantity), sum(acquisition_cost * quantity) from data where item_name='MK3MOD0' or item_name='ROBOT,EXPLOSIVE ORD' or item_name='ROBOT, EXPLOSIVE ORDINANCE DISPOSAL' or item_name='ROBOT,EXPLOSIVE,SPE';
+
+# All helicopters
+# select sum(quantity) from data where id_category='1520';
+
+# All airplanes
+# select sum(quantity) from data where id_category='1510';
+
+
