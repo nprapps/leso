@@ -26,8 +26,8 @@ psql leso -c "CREATE TABLE data (
   ui varchar,
   acquisition_cost decimal,
   ship_date timestamp,
-  supercategory varchar,
-  id_category varchar
+  federal_supply_category varchar,
+  federal_supply_class varchar
 );"
 psql leso -c "COPY data FROM '`pwd`/src/leso.csv' DELIMITER ',' CSV HEADER;"
 
@@ -41,8 +41,8 @@ psql leso -c "CREATE TABLE general (
   quantity decimal,
   ui varchar,
   ship_date timestamp,
-  supercategory varchar,
-  id_category varchar
+  federal_supply_category varchar,
+  federal_supply_class varchar
 );"
 psql leso -c "COPY general FROM '`pwd`/src/updated_general.csv' DELIMITER ',' CSV HEADER;"
 
@@ -56,8 +56,8 @@ psql leso -c "CREATE TABLE tactical (
   quantity decimal,
   ui varchar,
   ship_date timestamp,
-  supercategory varchar,
-  id_category varchar
+  federal_supply_category varchar,
+  federal_supply_class varchar
 );"
 psql leso -c "COPY tactical FROM '`pwd`/src/updated_tactical.csv' DELIMITER ',' CSV HEADER;"
 
