@@ -46,14 +46,6 @@ psql leso -c "CREATE TABLE general (
 );"
 psql leso -c "COPY general FROM '`pwd`/src/updated_general.csv' DELIMITER ',' CSV HEADER;"
 
-echo "Import agency type lookup"
-psql leso -c "CREATE TABLE agency_type_lookup (
-  agency_name varchar,
-  state char(2),
-  agency_type varchar
-);"
-psql leso -c "COPY agency_type_lookup FROM '`pwd`/src/agency_type_lookup.csv' DELIMITER ',' CSV HEADER;"
-
 # get updated general csv in the db
 echo "Import updated_tactical.csv to database"
 psql leso -c "CREATE TABLE tactical (
