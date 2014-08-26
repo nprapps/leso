@@ -3,5 +3,7 @@ src/tl_2013_us_county
 build
 export
 src/leso.csv
+src/updated_general.csv
+src/updated_tactical.csv
 .DS_Store
 *.pyc
