@@ -210,16 +210,3 @@ psql leso -c "CREATE OR REPLACE VIEW population as select d.state, d.county,
   join fips as f on d.state = f.state and d.county = f.county
   join acs as a on f.fips = a.fips
   group by d.state, d.county, a.total, a.white_alone, a.black_alone, a.indian_alone, a.asian_alone, a.hawaiian_alone, a.other_race_alone, a.two_or_more_races, a.two_or_more_races_including, a.two_or_more_races_excluding;"
-
-if [ ! -f "./tl_2013_us_county.zip" ]
-then
-  echo "Get county TIGER data"
-  curl -O http://www2.census.gov/geo/tiger/TIGER2013/COUNTY/tl_2013_us_county.zip
-  unzip tl_2013_us_county.zip -d src/tl_2013_us_county
-fi
-
-# import the geo data
-# gotta set the client encoding -- the import fails otherwise
-echo "Import geo data"
-PGCLIENTENCODING=LATIN1 ogr2ogr -f PostgreSQL PG:dbname=leso src/tl_2013_us_county/tl_2013_us_county.shp -t_srs EPSG:900913 -nlt multipolygon -nln tl_2013_us_county
-

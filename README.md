@@ -4,7 +4,7 @@
 
 * bash
 * Python
-* PostgreSQL + PostGIS
+* PostgreSQL
 
 ## Installation
 
