@@ -5,7 +5,7 @@ psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((q
 
 echo "Generate category distribution"
 psql leso -c "COPY (
-select c.full_name, c.code as federal_supply_code,
+select c.full_name, c.code as federal_supply_class,
   sum((d.quantity * d.acquisition_cost)) as total_cost
   from data as d
   join codes as c on d.federal_supply_class = c.code
