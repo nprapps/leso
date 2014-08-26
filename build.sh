@@ -1,10 +1,14 @@
 #!/bin/bash
 
-echo 'IMPORT THE DATA'
+echo 'IMPORT DATA'
+echo '-----------'
 ./import.sh
 
-echo 'CREATE THE OUTPUT FILES'
-./output.sh
+echo 'CREATE SUMMARY FILES'
+echo '--------------------'
+./summarize.sh
 
-echo 'GENERATE STATE FILES'
-./generate_states.sh
+echo 'EXPORT PROCESSED DATA'
+echo '---------------------'
+./export.sh
+

@@ -1,6 +1,9 @@
 tl_2013_us_county.zip
 src/tl_2013_us_county
 build
-state_data
+export
 src/leso.csv
+src/updated_general.csv
+src/updated_tactical.csv
 .DS_Store
+*.pyc
