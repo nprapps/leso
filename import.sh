@@ -46,35 +46,13 @@ psql leso -c "CREATE TABLE general (
 );"
 psql leso -c "COPY general FROM '`pwd`/src/updated_general.csv' DELIMITER ',' CSV HEADER;"
 
-echo "Categorize agencies in general data"
-psql leso -c "CREATE TYPE agency_type AS ENUM ('local_police', 'fbi', 'marshal', 'dhs',
-  'ranger', 'highway_patrol', 'sheriff_dept', 'blm', 'prison', 'dea', 'ice', 'parks',
-  'atf', 'fish_and_wildlife', 'fire', 'state_police', 'cbp', 'public_safety');"
-psql leso -c "ALTER TABLE general ADD agency_type agency_type;"
-psql leso -c "UPDATE general SET agency_type='local_police'
-  WHERE agency_name LIKE '%POLICE DEPT%' or agency_name LIKE '%POLICE DEPARTMENT%'
-  or agency_name LIKE '%MUNICIPAL POLICE%';"
-psql leso -c "UPDATE general SET agency_type='fbi'
-  WHERE agency_name LIKE '%FBI%' or agency_name LIKE '%FEDERAL BUREAU OF INVESTIGATION%'"
-psql leso -c "UPDATE general SET agency_type='marshal' WHERE agency_name LIKE '%MARSHAL%' 
-  and agency_name NOT LIKE '%FIRE MARSHAL%' and agency_name NOT LIKE '%MARSHALL COUNTY%';"
-psql leso -c "UPDATE general SET agency_type='public_safety' WHERE agency_name LIKE '%PUBLIC SAFETY%';"
-psql leso -c "UPDATE general SET agency_type='dhs' WHERE agency_name LIKE '%HOMELAND SEC%' or agency_name LIKE '%US DHS%';"
-psql leso -c "UPDATE general SET agency_type='ranger' WHERE agency_name LIKE '%RANGER%';"
-psql leso -c "UPDATE general SET agency_type='highway_patrol' WHERE agency_name LIKE '%PATROL%';"
-psql leso -c "UPDATE general SET agency_type='sheriff_dept' WHERE agency_name LIKE '%SHERIFF%';"
-psql leso -c "UPDATE general SET agency_type='blm' WHERE agency_name LIKE '%BUR OF LAND%';"
-psql leso -c "UPDATE general SET agency_type='dea' WHERE agency_name LIKE '%DOJ DEA%';"
-psql leso -c "UPDATE general SET agency_type='atf' WHERE agency_name LIKE '%DOJ ATF%' or agency_name LIKE '%ALCOHOL AND TOBACCO%';"
-psql leso -c "UPDATE general SET agency_type='ice' WHERE agency_name LIKE '%DHS ICE%' 
-  or agency_name LIKE '%IMMIGRATION AND CUSTOMS ENFORCEMENT%';"
-psql leso -c "UPDATE general SET agency_type='prison' WHERE agency_name LIKE '%PRISON%';"
-psql leso -c "UPDATE general SET agency_type='parks' WHERE agency_name LIKE '%PARKS%';"
-psql leso -c "UPDATE general SET agency_type='fish_and_wildlife' WHERE agency_name LIKE '%FISH AND WILDLIFE%'
-  or agency_name LIKE '%FISH AND GAME%' or agency_name LIKE '%FISH & WILDLIFE%';"
-psql leso -c "UPDATE general SET agency_type='fire' WHERE agency_name LIKE '%FIRE%' and agency_name NOT LIKE '%FIREARMS%';"
-psql leso -c "UPDATE general SET agency_type='state_police' WHERE agency_name LIKE '%STATE POLICE%';"
-psql leso -c "UPDATE general SET agency_type='cbp' WHERE agency_name LIKE '%DOJ CBP%';"
+echo "Import agency type lookup"
+psql leso -c "CREATE TABLE agency_type_lookup (
+  agency_name varchar,
+  state char(2),
+  agency_type varchar
+);"
+psql leso -c "COPY agency_type_lookup FROM '`pwd`/src/agency_type_lookup.csv' DELIMITER ',' CSV HEADER;"
 
 # get updated general csv in the db
 echo "Import updated_tactical.csv to database"
