@@ -210,3 +210,18 @@ psql leso -c "CREATE OR REPLACE VIEW population as select d.state, d.county,
   join fips as f on d.state = f.state and d.county = f.county
   join acs as a on f.fips = a.fips
   group by d.state, d.county, a.total, a.white_alone, a.black_alone, a.indian_alone, a.asian_alone, a.hawaiian_alone, a.other_race_alone, a.two_or_more_races, a.two_or_more_races_including, a.two_or_more_races_excluding;"
+
+echo "Import generate agency.csv"
+in2csv --sheet "State Agencies" src/States\ and\ Federal\ LEAs\ in\ LESO\ as\ of\ 27\ Aug\ 2014.xlsx > src/state_agencies.csv
+in2csv --sheet "Federal Agencies" src/States\ and\ Federal\ LEAs\ in\ LESO\ as\ of\ 27\ Aug\ 2014.xlsx > src/federal_agencies.csv
+in2csv --sheet "Tribal Agencies" src/States\ and\ Federal\ LEAs\ in\ LESO\ as\ of\ 27\ Aug\ 2014.xlsx > src/tribal_agencies.csv
+csvstack -n "agency_type" -g "state,federal,tribal" src/state_agencies.csv src/federal_agencies.csv src/tribal_agencies.csv | csvcut -c "1,3,4" > src/agencies.csv
+
+echo "Import agencies to database"
+psql leso -c "CREATE TABLE agencies (
+  agency_type varchar,
+  state varchar,
+  agency_name varchar
+);"
+psql leso -c "COPY agencies FROM '`pwd`/src/agencies.csv' DELIMITER ',' CSV HEADER;"
+

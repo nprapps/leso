@@ -5,5 +5,9 @@ export
 src/leso.csv
 src/updated_general.csv
 src/updated_tactical.csv
+src/federal_agencies.csv
+src/state_agencies.csv
+src/tribal_agencies.csv
+src/agencies.csv
 .DS_Store
 *.pyc
