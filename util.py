@@ -19,8 +19,10 @@ def make_headers(worksheet):
     return headers
 
 
-def clean_data(worksheet, writer, headers, datemode):
-    row_idx = 1
+def clean_data(worksheet, datemode, row_idx=1):
+    headers = make_headers(worksheet)
+    data = []
+
     while row_idx < worksheet.nrows:
         cell_idx = 0
         row_dict = {}
@@ -66,8 +68,11 @@ def clean_data(worksheet, writer, headers, datemode):
                 except AttributeError:
                     # Numbers
                     cell_value = worksheet.cell_value(row_idx, cell_idx)
+
             row_dict[header] = cell_value
             cell_idx += 1
 
-        writer.writerow(row_dict)
+        data.append(row_dict)
         row_idx += 1
+
+    return data
