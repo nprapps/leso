@@ -191,4 +191,3 @@ psql leso -c "CREATE TABLE agencies (
   agency_name varchar
 );"
 psql leso -c "COPY agencies FROM '`pwd`/src/agencies.csv' DELIMITER ',' CSV HEADER;"
-

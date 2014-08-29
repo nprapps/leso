@@ -11,7 +11,7 @@ def make_headers(worksheet):
     while cell_idx < worksheet.ncols:
         cell_type = worksheet.cell_type(0, cell_idx)
         cell_value = worksheet.cell_value(0, cell_idx)
-        cell_value = slugify(cell_value).replace('-', '_')
+        cell_value = slugify(unicode(cell_value)).replace('-', '_')
         if cell_type == 1:
             headers[cell_idx] = cell_value
         cell_idx += 1
