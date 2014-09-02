@@ -10,7 +10,9 @@
 
 Install project requirements (preferably in a virtualenv):
 
-   pip install -r requirements.txt
+```
+pip install -r requirements.txt
+```
 
 ## Import the data
 
