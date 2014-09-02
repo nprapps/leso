@@ -15,7 +15,6 @@ if __name__ == "__main__":
         data = clean_data(sheet, datemode)
 
     headers = data[0].keys()
-    print(headers)
 
     f = open("src/leso.csv", "w")
     writer = csv.DictWriter(f, fieldnames=headers)

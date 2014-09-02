@@ -4,13 +4,13 @@ from datetime import datetime
 from slugify import slugify
 
 
-def make_headers(worksheet):
+def make_headers(worksheet, header_row=0):
     """Make headers"""
     headers = {}
     cell_idx = 0
     while cell_idx < worksheet.ncols:
-        cell_type = worksheet.cell_type(0, cell_idx)
-        cell_value = worksheet.cell_value(0, cell_idx)
+        cell_type = worksheet.cell_type(header_row, cell_idx)
+        cell_value = worksheet.cell_value(header_row, cell_idx)
         cell_value = slugify(unicode(cell_value)).replace('-', '_')
         if cell_type == 1:
             headers[cell_idx] = cell_value
@@ -19,10 +19,10 @@ def make_headers(worksheet):
     return headers
 
 
-def clean_data(worksheet, datemode, row_idx=1):
-    headers = make_headers(worksheet)
+def clean_data(worksheet, datemode, start_row=0):
+    headers = make_headers(worksheet, start_row)
+    row_idx = start_row + 1
     data = []
-
     while row_idx < worksheet.nrows:
         cell_idx = 0
         row_dict = {}
@@ -33,7 +33,13 @@ def clean_data(worksheet, datemode, row_idx=1):
                 cell_idx += 1
                 continue
 
-            if header == "ship_date":
+            if header == "station_name_lea" or header == "law_enforcement_agency":
+                header = "agency_name"
+
+            if header == "last_inventory_date":
+                header = "inventory_date"
+
+            if header == "ship_date" or header == "inventory_date":
                 # clean date
                 try:
                     cell_value = int(worksheet.cell_value(row_idx, cell_idx))

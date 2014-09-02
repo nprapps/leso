@@ -191,3 +191,34 @@ psql leso -c "CREATE TABLE agencies (
   agency_name varchar
 );"
 psql leso -c "COPY agencies FROM '`pwd`/src/agencies.csv' DELIMITER ',' CSV HEADER;"
+
+psql leso -c "CREATE TABLE state_specific (
+    agency_name varchar,
+    book_type varchar,
+    county varchar,
+    demil_code varchar,
+    demil_ic varchar,
+    dodaac varchar,
+    dtid varchar,
+    federal_supply_category varchar,
+    federal_supply_class varchar,
+    image_count integer,
+    item_name varchar,
+    inventory_date timestamp,
+    nsn varchar,
+    property_number varchar,
+    property_status varchar,
+    quantity integer,
+    requisition_date varchar,
+    requisition_number varchar,
+    serial_number varchar,
+    serial_number_required_flag varchar,
+    ship_date timestamp,
+    state varchar,
+    station_active_flag varchar,
+    station_type varchar,
+    total_cost integer,
+    ui varchar,
+    unit_cost varchar
+ );"
+psql leso -c "COPY state_specific FROM '`pwd`/src/state-specific.csv' DELIMITER ',' CSV HEADER;"
