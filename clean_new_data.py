@@ -68,6 +68,8 @@ if __name__ == "__main__":
                 data = clean_data(sheet, datemode, start_row)
                 for row in data:
                     row["state"] = state
+                    if "row" in row.keys():
+                        del row["row"]
                 all_data += data
 
     f = open("src/state-specific.csv", "w")

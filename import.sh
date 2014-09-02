@@ -4,6 +4,10 @@
 echo "Run clean.py to generate leso.csv"
 ./clean.py
 
+# Import state specific data
+echo "Run clean_new_data.py to generate state-specific.csv"
+./clean_new_data.py
+
 # setup our database
 echo "Create database"
 dropdb --if-exists leso
@@ -15,16 +19,16 @@ psql leso -c "SELECT postgis_full_version()"
 # get leso csv in the db
 echo "Import leso.csv to database"
 psql leso -c "CREATE TABLE data (
-  state char(2),
-  county varchar,
-  nsn varchar,
-  item_name varchar,
-  quantity decimal,
-  ui varchar,
   acquisition_cost decimal,
-  ship_date timestamp,
+  county varchar,
   federal_supply_category varchar,
-  federal_supply_class varchar
+  federal_supply_class varchar,
+  item_name varchar,
+  nsn varchar,
+  quantity decimal,
+  ship_date timestamp,
+  state char(2),
+  ui varchar
 );"
 psql leso -c "COPY data FROM '`pwd`/src/leso.csv' DELIMITER ',' CSV HEADER;"
 
@@ -192,6 +196,7 @@ psql leso -c "CREATE TABLE agencies (
 );"
 psql leso -c "COPY agencies FROM '`pwd`/src/agencies.csv' DELIMITER ',' CSV HEADER;"
 
+echo "Import state-specific.csv to database"
 psql leso -c "CREATE TABLE state_specific (
     agency_name varchar,
     book_type varchar,
@@ -217,8 +222,8 @@ psql leso -c "CREATE TABLE state_specific (
     state varchar,
     station_active_flag varchar,
     station_type varchar,
-    total_cost integer,
+    total_cost numeric,
     ui varchar,
-    unit_cost varchar
+    unit_cost numeric
  );"
 psql leso -c "COPY state_specific FROM '`pwd`/src/state-specific.csv' DELIMITER ',' CSV HEADER;"
