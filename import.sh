@@ -54,89 +54,6 @@ psql leso -c "COPY codes FROM '`pwd`/src/codes.csv' DELIMITER ',' CSV HEADER;"
 psql leso -c "DELETE FROM codes USING codes codes2 WHERE codes.code=codes2.code AND codes.START_DATE > codes2.START_DATE;"
 
 echo "Import ACS 5 year data"
-psql leso -c "CREATE TABLE acs_5yr(
-  census_id VARCHAR,
-  fips VARCHAR,
-  place_name VARCHAR,
-  total INTEGER,
-  total_error VARCHAR,
-  white_alone INTEGER,
-  white_alone_error NUMERIC,
-  black_alone INTEGER,
-  black_alone_error NUMERIC,
-  indian_alone INTEGER,
-  indian_alone_error NUMERIC,
-  asian_alone INTEGER,
-  asian_alone_error NUMERIC,
-  hawaiian_alone INTEGER,
-  hawaiian_alone_error NUMERIC,
-  other_race_alone INTEGER,
-  other_race_alone_error NUMERIC,
-  two_or_more_races INTEGER,
-  two_or_more_races_error NUMERIC,
-  two_or_more_races_including INTEGER,
-  two_or_more_races_including_error NUMERIC,
-  two_or_more_races_excluding INTEGER,
-  two_or_more_races_excluding_error NUMERIC
-);"
-PGCLIENTENCODING=LATIN1 psql leso -c "COPY acs_5yr FROM '`pwd`/src/census/acs_12_5yr_b02001.csv' DELIMITER ',' CSV"
-
-echo "Import ACS 3 year data"
-psql leso -c "CREATE TABLE acs_3yr(
-  census_id VARCHAR,
-  fips VARCHAR,
-  place_name VARCHAR,
-  total INTEGER,
-  total_error VARCHAR,
-  white_alone INTEGER,
-  white_alone_error NUMERIC,
-  black_alone INTEGER,
-  black_alone_error NUMERIC,
-  indian_alone INTEGER,
-  indian_alone_error NUMERIC,
-  asian_alone INTEGER,
-  asian_alone_error NUMERIC,
-  hawaiian_alone INTEGER,
-  hawaiian_alone_error NUMERIC,
-  other_race_alone INTEGER,
-  other_race_alone_error NUMERIC,
-  two_or_more_races INTEGER,
-  two_or_more_races_error NUMERIC,
-  two_or_more_races_including INTEGER,
-  two_or_more_races_including_error NUMERIC,
-  two_or_more_races_excluding INTEGER,
-  two_or_more_races_excluding_error NUMERIC
-);"
-PGCLIENTENCODING=LATIN1 psql leso -c "COPY acs_3yr FROM '`pwd`/src/census/acs_12_3yr_b02001.csv' DELIMITER ',' CSV"
-
-echo "Import ACS 1 year data"
-psql leso -c "CREATE TABLE acs_1yr(
-  census_id VARCHAR,
-  fips VARCHAR,
-  place_name VARCHAR,
-  total INTEGER,
-  total_error VARCHAR,
-  white_alone INTEGER,
-  white_alone_error NUMERIC,
-  black_alone INTEGER,
-  black_alone_error NUMERIC,
-  indian_alone INTEGER,
-  indian_alone_error NUMERIC,
-  asian_alone INTEGER,
-  asian_alone_error NUMERIC,
-  hawaiian_alone INTEGER,
-  hawaiian_alone_error NUMERIC,
-  other_race_alone INTEGER,
-  other_race_alone_error NUMERIC,
-  two_or_more_races INTEGER,
-  two_or_more_races_error NUMERIC,
-  two_or_more_races_including INTEGER,
-  two_or_more_races_including_error NUMERIC,
-  two_or_more_races_excluding INTEGER,
-  two_or_more_races_excluding_error NUMERIC
-);"
-PGCLIENTENCODING=LATIN1 psql leso -c "COPY acs_1yr FROM '`pwd`/src/census/acs_12_1yr_b02001.csv' DELIMITER ',' CSV"
-
 psql leso -c "CREATE TABLE acs(
   census_id VARCHAR,
   fips VARCHAR,
@@ -160,13 +77,9 @@ psql leso -c "CREATE TABLE acs(
   two_or_more_races_including INTEGER,
   two_or_more_races_including_error NUMERIC,
   two_or_more_races_excluding INTEGER,
-  two_or_more_races_excluding_error NUMERIC,
-  estimate_type INTEGER
+  two_or_more_races_excluding_error NUMERIC
 );"
-psql leso -c "insert into acs select * from acs_5yr; update acs set estimate_type=5;"
-psql leso -c "delete from acs where fips in (select fips from acs_3yr); insert into acs select * from acs_3yr; update acs set estimate_type=3 where estimate_type is null;"
-psql leso -c "delete from acs where fips in (select fips from acs_1yr); insert into acs select * from acs_1yr; update acs set estimate_type=1 where estimate_type is null;"
-
+PGCLIENTENCODING=LATIN1 psql leso -c "COPY acs FROM '`pwd`/src/census/acs_12_5yr_b02001.csv' DELIMITER ',' CSV"
 
 echo "Generate population view"
 psql leso -c "CREATE OR REPLACE VIEW population as select d.state, d.county,
