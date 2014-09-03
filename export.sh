@@ -2,7 +2,7 @@
 
 echo "Generate raw CSV tables"
 mkdir -p export/db
-psql leso -c "COPY population to '`pwd`/export/db/population.csv' WITH CSV HEADER;"
+psql leso -c "COPY (select * from population) to '`pwd`/export/db/population.csv' WITH CSV HEADER;"
 psql leso -c "COPY codes to '`pwd`/export/db/codes.csv' WITH CSV HEADER;"
 psql leso -c "COPY fips to '`pwd`/export/db/fips.csv' WITH CSV HEADER;"
 psql leso -c "COPY data to '`pwd`/export/db/data.csv' WITH CSV HEADER;"
