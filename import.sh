@@ -91,7 +91,7 @@ psql leso -c "CREATE OR REPLACE VIEW population as select d.state, d.county,
   join acs as a on f.fips = a.fips
   group by d.state, d.county, a.total, a.white_alone, a.black_alone, a.indian_alone, a.asian_alone, a.hawaiian_alone, a.other_race_alone, a.two_or_more_races, a.two_or_more_races_including, a.two_or_more_races_excluding;"
 
-echo "Import generate agency.csv"
+echo "Import agency.csv"
 in2csv --sheet "State Agencies" src/States\ and\ Federal\ LEAs\ in\ LESO\ as\ of\ 27\ Aug\ 2014.xlsx > src/state_agencies.csv
 in2csv --sheet "Federal Agencies" src/States\ and\ Federal\ LEAs\ in\ LESO\ as\ of\ 27\ Aug\ 2014.xlsx > src/federal_agencies.csv
 in2csv --sheet "Tribal Agencies" src/States\ and\ Federal\ LEAs\ in\ LESO\ as\ of\ 27\ Aug\ 2014.xlsx > src/tribal_agencies.csv
