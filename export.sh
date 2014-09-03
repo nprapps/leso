@@ -57,3 +57,42 @@ psql leso -c "COPY (
   join codes as c on d.federal_supply_class = c.code
   join codes as sc on d.federal_supply_category = sc.code
 ) to '`pwd`/export/states/all_states.csv' WITH CSV HEADER;"
+
+psql leso -t -A -c "select distinct(state) from state_specific" | while read STATE; do
+  echo "Creating export/states/specific/$STATE.csv"
+  psql leso -c "COPY (
+    select s.agency_name,
+      s.book_type,
+      s.county,
+      s.demil_code,
+      s.demil_ic,
+      s.dodaac,
+      s.dtid,
+      s.federal_supply_category,
+      s.federal_supply_class,
+      s.image_count,
+      s.item_name,
+      s.inventory_date,
+      s.nsn,
+      s.property_number,
+      s.property_status,
+      s.quantity,
+      s.requisition_date,
+      s.requisition_number,
+      s.row,
+      s.serial_number,
+      s.serial_number_required_flag,
+      s.ship_date,
+      s.station_active_flag,
+      s.station_type,
+      s.total_cost,
+      s.ui,
+      s.unit_cost,
+      sc.name as federal_supply_category_name,
+      c.full_name as federal_supply_class_name
+    from state_specific as s
+    left join codes as c on s.federal_supply_class = c.code
+    left join codes as sc on s.federal_supply_category = sc.code
+    where s.state='$STATE'
+  ) to '`pwd`/export/states/specific/$STATE.csv' WITH CSV HEADER;"
+done
