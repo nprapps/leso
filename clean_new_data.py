@@ -77,8 +77,8 @@ if __name__ == "__main__":
     writer.writeheader()
     for row in all_data:
         writer.writerow(row)
-        #try:
-        #except ValueError:
-            #import ipdb; ipdb.set_trace();
-            #print ""
+        # try:
+        # except ValueError:
+        #     import ipdb; ipdb.set_trace();
+        #     print ""
 
