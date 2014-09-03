@@ -4,10 +4,6 @@
 echo "Run clean.py to generate leso.csv"
 ./clean.py
 
-# Import state specific data
-echo "Run clean_new_data.py to generate state-specific.csv"
-./clean_new_data.py
-
 # setup our database
 echo "Create database"
 dropdb --if-exists leso
@@ -195,6 +191,10 @@ psql leso -c "CREATE TABLE agencies (
   agency_name varchar
 );"
 psql leso -c "COPY agencies FROM '`pwd`/src/agencies.csv' DELIMITER ',' CSV HEADER;"
+
+# Import state specific data
+echo "Run clean_new_data.py to generate state-specific.csv"
+./clean_new_data.py
 
 echo "Import state-specific.csv to database"
 psql leso -c "CREATE TABLE state_specific (
