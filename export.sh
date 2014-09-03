@@ -58,6 +58,8 @@ psql leso -c "COPY (
   join codes as sc on d.federal_supply_category = sc.code
 ) to '`pwd`/export/states/all_states.csv' WITH CSV HEADER;"
 
+echo "Creating state specific dumps"
+mkdir -p export/states/specific
 psql leso -t -A -c "select distinct(state) from state_specific" | while read STATE; do
   echo "Creating export/states/specific/$STATE.csv"
   psql leso -c "COPY (
