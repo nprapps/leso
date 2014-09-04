@@ -6,17 +6,18 @@ import os
 import pprint
 from util import clean_data
 
-OFFSET_FILES = [
-    'AR',
-    'CO',
-    'GA',
-    'IA',
-    'MT',
-    'ND',
-    'NE',
-    'NV',
-    'WA',
-]
+OFFSETS = {
+    'AR': 5,
+    'CO': 5,
+    'GA': 5,
+    'IA': 5,
+    'MT': 5,
+    'ND': 5,
+    'NE': 5,
+    'NV': 5,
+    'TX': 1,
+    'WA': 5,
+}
 
 DEFAULT_HEADERS = [
     'agency_name',
@@ -58,8 +59,8 @@ if __name__ == "__main__":
             datemode = workbook.datemode
             worksheets = workbook.sheet_names()
 
-            if state in OFFSET_FILES:
-                start_row = 5
+            if state in OFFSETS.keys():
+                start_row = OFFSETS[state]
             else:
                 start_row = 0
 
