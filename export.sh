@@ -66,12 +66,12 @@ psql leso -t -A -c "select distinct(state) from state_specific" | while read STA
     select s.agency_name,
       s.item_name,
       s.quantity,
-      s.ui,
       s.unit_cost,
+      s.ui,
       s.total_cost,
       s.county,
       s.ship_date,
-      s.station_type,
+      s.nsn,
       s.federal_supply_category,
       sc.name as federal_supply_category_name,
       s.federal_supply_class,
@@ -89,6 +89,7 @@ psql leso -t -A -c "select distinct(state) from state_specific" | while read STA
       s.requisition_number,
       s.serial_number,
       s.serial_number_required_flag,
+      s.station_type,
       s.station_active_flag
     from state_specific as s
     left join codes as c on s.federal_supply_class = c.code
