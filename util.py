@@ -39,7 +39,7 @@ def clean_data(worksheet, datemode, start_row=0):
             if header == "last_inventory_date":
                 header = "inventory_date"
 
-            if header == "ship_date" or header == "inventory_date":
+            if header == "ship_date" or header == "inventory_date" or header == "requisition_date":
                 # clean date
                 try:
                     cell_value = int(worksheet.cell_value(row_idx, cell_idx))
