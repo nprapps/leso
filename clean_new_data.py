@@ -17,6 +17,7 @@ OFFSETS = {
     'NV': 5,
     'TX': 1,
     'WA': 5,
+    'WI': 3,
 }
 
 DEFAULT_HEADERS = [
