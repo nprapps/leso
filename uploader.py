@@ -12,11 +12,20 @@ from apiclient.errors import HttpError
 from apiclient.http import MediaFileUpload
 from tarbell.oauth import get_drive_api_from_client_secrets
 
+
+def _upload(service, body, media_body):
+    service.files().insert(body=body, media_body=media_body,
+                           convert=True).execute()
+
+
 def upload(directory, folder_id, title_suffix, description_prefix):
     files = [ f for f in listdir(export_path) if isfile(join(export_path,f)) ]
     files.sort()
     files.reverse()
     for filename in files:
+        if not filename.endswith(".csv"):
+            continue
+
         name = filename[0:-4]
         media_body = MediaFileUpload(
             os.path.join(export_path, "%s" % filename), mimetype="text/csv")
@@ -31,8 +40,7 @@ def upload(directory, folder_id, title_suffix, description_prefix):
         }
         try:
             print("Uploading {0}".format(filename))
-            newfile = service.files().insert(body=body, media_body=media_body,
-                convert=True).execute()
+            _upload(service, body, media_body)
         except HttpError, e:
             error = json.loads(e.content)
             pp(error)

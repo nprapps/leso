@@ -33,14 +33,17 @@ def clean_data(worksheet, datemode, start_row=0):
                 cell_idx += 1
                 continue
 
-            if header == "lea" or header == "station_name_lea" or header == "law_enforcement_agency":
+            if header == "agency" or header == "lea" or header == "station_name_lea" or header == "law_enforcement_agency":
                 header = "agency_name"
 
             if header == "qty":
                 header = "quantity"
 
-            if header == "acquisition_cost_per_unit":
+            if header == "acquisition_cost_per_unit" or header == "item_value":
                 header = "unit_cost"
+
+            if header == "total_value":
+                header = "total_cost"
 
             if header == "transaction_date":
                 header = "ship_date"

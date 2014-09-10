@@ -68,7 +68,7 @@ psql leso -t -A -c "select distinct(state) from state_specific" | while read STA
       s.quantity,
       s.unit_cost,
       s.ui,
-      s.total_cost,
+      s.quantity * s.unit_cost as total_cost,
       s.county,
       s.ship_date,
       s.nsn,
