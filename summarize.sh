@@ -6,6 +6,7 @@ psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((q
 echo "Generate category distribution"
 psql leso -c "COPY (
 select c.full_name, c.code as federal_supply_class,
+  sum(d.quantity) as quantity,
   sum((d.quantity * d.acquisition_cost)) as total_cost
   from data as d
   join codes as c on d.federal_supply_class = c.code
@@ -34,6 +35,20 @@ echo "Generate top 10 supercategory time series"
 psql leso -c "COPY (
 select c.name, sum(quantity * acquisition_cost) as total_cost, extract(year from ship_date) as y from data as d join codes as c on d.federal_supply_category = c.code where federal_supply_category in (select code from supercategories order by total_cost desc limit 10) group by c.name, y order by y desc
 ) to '`pwd`/build/supercategory_timeseries.csv' WITH CSV HEADER;"
+
+echo "Generate airplane table"
+psql leso -c "COPY (
+  select item_name, sum(quantity) as total_quantity, sum(quantity * acquisition_cost) as total_cost
+  from data where federal_supply_class = '1510'
+  group by item_name order by total_cost desc
+) to '`pwd`/build/airplanes_by_item.csv' WITH CSV HEADER;"
+
+echo "Generate helicopter table"
+psql leso -c "COPY (
+  select item_name, sum(quantity) as total_quantity, sum(quantity * acquisition_cost) as total_cost
+  from data where federal_supply_class = '1520'
+  group by item_name order by total_cost desc
+) to '`pwd`/build/helicopters_by_item.csv' WITH CSV HEADER;"
 
 echo "Generate item name distribution with units"
 psql leso -c "COPY (
@@ -106,9 +121,11 @@ psql leso -c "COPY (
 
 echo "Generate weapons table"
 psql leso -c "COPY (
-  select item_name, sum(quantity) as total_quantity, sum(quantity * acquisition_cost) as total_cost
-  from data where federal_supply_category = '10'
-  group by item_name order by total_cost desc
+  select d.item_name, d.federal_supply_class, c.full_name, sum(d.quantity) as total_quantity, sum(d.quantity * d.acquisition_cost) as total_cost
+  from data as d
+  join codes as c on d.federal_supply_class = c.code
+  where federal_supply_category = '10'
+  group by d.item_name, d.federal_supply_class, c.full_name order by total_cost desc
 ) to '`pwd`/build/weapons_by_item.csv' WITH CSV HEADER;"
 
 echo "Generate VA table"
@@ -155,5 +172,4 @@ psql leso -c "COPY (
 
 # All airplanes
 # select sum(quantity) from data where id_category='1510';
-
 
