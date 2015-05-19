@@ -63,6 +63,8 @@ def clean_data(worksheet, writer, headers, datemode):
                 try:
                     # Strings
                     cell_value = worksheet.cell_value(row_idx, cell_idx).strip()
+                    if cell_value.startswith('DESC='):
+                        cell_value = cell_value[5:]
                 except AttributeError:
                     # Numbers
                     cell_value = worksheet.cell_value(row_idx, cell_idx)
