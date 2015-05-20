@@ -4,7 +4,7 @@ echo "Generate min date summary"
 psql leso -c "COPY (select distinct(state), min(ship_date) from data group by state order by state) to '`pwd`/build/date_summary.csv' with CSV HEADER;"
 
 echo "Generate unit distribution"
-psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((quantity*acquisition_cost)) as total_cost from data group by ui order by count desc) to '`pwd`/build/unit_distribution.csv' WITH CSV HEADER;"
+psql leso -c "COPY (select ui, count(*), sum(quantity) as total_quantity, sum((quantity*acquisition_cost)) as total_cost from data where ship_date >= '2006-01-01 00:00:00' group by ui order by count desc) to '`pwd`/build/unit_distribution.csv' WITH CSV HEADER;"
 
 echo "Generate category distribution"
 psql leso -c "COPY (
@@ -13,6 +13,7 @@ select c.full_name, c.code as federal_supply_class,
   sum((d.quantity * d.acquisition_cost)) as total_cost
   from data as d
   join codes as c on d.federal_supply_class = c.code
+  where d.ship_date >= '2006-01-01 00:00:00'
   group by c.full_name, c.code
   order by c.full_name
 ) to '`pwd`/build/category_distribution.csv' WITH CSV HEADER;"
@@ -23,6 +24,7 @@ select c.name,
   sum((d.quantity * d.acquisition_cost)) as total_cost
   from data as d
   join codes as c on d.federal_supply_category = c.code
+  where d.ship_date >= '2006-01-01 00:00:00'
   group by c.name
   order by total_cost desc
 ) to '`pwd`/build/supercategory_distribution.csv' WITH CSV HEADER;"
